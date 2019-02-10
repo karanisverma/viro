@@ -129,14 +129,13 @@ var ARCarDemo = createReactClass({
           </ViroNode>
 
           <Viro3DObject
-            scale={[0, 0, 0]}
+            scale={[0.09, 0.09, 0.09]}
             source={require("./res/tesla/object_car.obj")}
             resources={[require("./res/tesla/object_car.mtl")]}
             type="OBJ"
             materials={this.state.texture}
             onClick={this._toggleButtons}
-            animation={{ name: "scaleCar", run: this.state.animateCar }}
-
+            animation={{ name: "rotate", run: true, loop: true }}
           />
 
           <ViroSpotLight
@@ -302,7 +301,11 @@ ViroAnimations.registerAnimations({
     duration: 50,
     easing: "easeineaseout"
   },
-  tapAnimation: [["scaleSphereUp", "scaleSphereDown"]]
+  tapAnimation: [["scaleSphereUp", "scaleSphereDown"]],
+  rotate: {
+    properties: { rotateY: "+=90" },
+    duration: 250 //.25 seconds
+  }
 });
 
 module.exports = ARCarDemo;
