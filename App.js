@@ -27,22 +27,22 @@ var createReactClass = require('create-react-class');
  */
 var apiKey = "54AAE59D-B773-4281-A84D-9447A8B3279F";
 
-var vrScenes = {
-    '360PhotoTour': require('./js/360PhotoTour/MainScene'),
-    'HumanBody': require('./js/HumanBody/MainScene'),
-    'ProductShowcase': require('./js/ProductShowcase/ProductShowcase'),
-    'ViroMediaPlayer': require('./js/ViroMediaPlayer/ViroTheatre'),
-    'ParticleEmitters': require('./js/ParticleEmitters/ViroParticleTemplates'),
-    'PhysicsSample': require('./js/PhysicsSample/BasicPhysicsSample'),
-}
+// var vrScenes = {
+//     '360PhotoTour': require('./js/360PhotoTour/MainScene'),
+//     'HumanBody': require('./js/HumanBody/MainScene'),
+//     'ProductShowcase': require('./js/ProductShowcase/ProductShowcase'),
+//     'ViroMediaPlayer': require('./js/ViroMediaPlayer/ViroTheatre'),
+//     'ParticleEmitters': require('./js/ParticleEmitters/ViroParticleTemplates'),
+//     'PhysicsSample': require('./js/PhysicsSample/BasicPhysicsSample'),
+// }
 
-var arScenes = {
-  'ARSimpleSample': require('./js/ARSample/HelloWorldSceneAR.js'),
-  'ARPhysicsSample': require('./js/ARPhysicsSample/BasicPhysicsSample.js'),
-  'ARCarDemo' : require('./js/ARCarDemo/ARCarDemo.js'),
-  'ARPosterDemo' : require('./js/ARPosterDemo/ARPosterDemo.js'),
-  'BusinessCard' : require('./js/ARBusinessCard/BusinessCard.js'),
-}
+// var arScenes = {
+//   'ARSimpleSample': require('./js/ARSample/HelloWorldSceneAR.js'),
+//   'ARPhysicsSample': require('./js/ARPhysicsSample/BasicPhysicsSample.js'),
+//   'ARCarDemo' : require('./js/ARCarDemo/ARCarDemo.js'),
+//   'ARPosterDemo' : require('./js/ARPosterDemo/ARPosterDemo.js'),
+//   'BusinessCard' : require('./js/ARBusinessCard/BusinessCard.js'),
+// }
 
 var showARScene = true;
 
@@ -53,19 +53,10 @@ var ViroCodeSamplesSceneNavigator = createReactClass({
       return (
         <ViroARSceneNavigator
           initialScene={{
-            scene: arScenes['ARCarDemo'],
+            scene: require('./js/ARCarDemo/ARCarDemo.js'),
           }}
           apiKey={apiKey} />
         );
-    } else {
-      return (
-        <ViroVRSceneNavigator
-          initialScene={{
-            scene: vrScenes['360PhotoTour'],
-          }}
-          apiKey={apiKey} />
-      );
-
     }
   }
 });
