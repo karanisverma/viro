@@ -32,7 +32,8 @@ var ARCarDemo = createReactClass({
       tapBlue: false,
       tapGrey: false,
       tapRed: false,
-      tapYellow: false
+      tapYellow: false,
+      rotation : [0, 0, 0]
     };
   },
 
@@ -43,8 +44,8 @@ var ARCarDemo = createReactClass({
           source={require("./res/tesla/garage_1k.hdr")}
         />
         <ViroARPlaneSelector
-          minHeight={0.05}
-          minWidth={0.05}
+          minHeight={0.03}
+          minWidth={0.03}
           onPlaneSelected={this._onAnchorFound}
         >
           <ViroNode
@@ -127,7 +128,7 @@ var ARCarDemo = createReactClass({
               shadowCastingBitMask={0}
             />
           </ViroNode>
-
+          <ViroNode rotation={this.state.rotation} ref={this._setARNodeRef}>
           <Viro3DObject
             scale={[0.09, 0.09, 0.09]}
             source={require("./res/tesla/object_car.obj")}
@@ -135,9 +136,9 @@ var ARCarDemo = createReactClass({
             type="OBJ"
             materials={this.state.texture}
             onClick={this._toggleButtons}
-            animation={{ name: "rotate", run: true, loop: true }}
+            onRotate={this._onRotate}
           />
-
+          </ViroNode>
           <ViroSpotLight
             innerAngle={5}
             outerAngle={25}
@@ -167,9 +168,21 @@ var ARCarDemo = createReactClass({
       animateCar: true
     });
   },
-  _onRotate(rotateState, rotationFactor, source) {
-    console.log(rotateState, rotationFactor, source);
+  _setARNodeRef(component) {
+    this.arNodeRef = component;
   },
+  _onRotate(rotateState, rotationFactor, source) {
+
+    if (rotateState == 3) {
+      this.setState({
+        rotation : [this.state.rotation[0], this.state.rotation[1] + rotationFactor, this.state.rotation[2]]
+      });
+      return;
+    }
+
+    this.arNodeRef.setNativeProps({rotation:[this.state.rotation[0], this.state.rotation[1] + rotationFactor, this.state.rotation[2]]});
+  },
+
   _toggleButtons() {
     this.setState({
       animName: this.state.animName == "scaleUp" ? "scaleDown" : "scaleUp",
