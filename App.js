@@ -44,12 +44,10 @@ var apiKey = "54AAE59D-B773-4281-A84D-9447A8B3279F";
 //   'BusinessCard' : require('./js/ARBusinessCard/BusinessCard.js'),
 // }
 
-var showARScene = true;
+var showARScene = false;
 
 var ViroCodeSamplesSceneNavigator = createReactClass({
   render: function() {
-
-    if (showARScene) {
       return (
         <ViroARSceneNavigator
           initialScene={{
@@ -57,7 +55,6 @@ var ViroCodeSamplesSceneNavigator = createReactClass({
           }}
           apiKey={apiKey} />
         );
-    }
   }
 });
 

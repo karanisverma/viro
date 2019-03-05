@@ -17,7 +17,8 @@ import {
   ViroSpotLight,
   ViroQuad,
   ViroBox,
-  ViroARPlaneSelector
+  ViroARPlaneSelector,
+  ViroPolygon
 } from "react-viro";
 
 var createReactClass = require("create-react-class");
@@ -48,6 +49,21 @@ var ARCarDemo = createReactClass({
           minWidth={0.03}
           onPlaneSelected={this._onAnchorFound}
         >
+        <ViroNode>
+          <ViroPolygon
+              position={[-0.25, 0.1, 0]}
+              vertices={[[-0.08,0], [0,0.08], [0,-0.08]]}
+              materials={"blue_plane"}
+              onClick={this._pervCar}
+              />
+          <ViroPolygon
+              position={[0.25, 0.1, 0]}
+              vertices={[[0.08,0], [0,0.08], [0,-0.08]]}
+              materials={"blue_plane"}
+              onClick={this._nextCar}
+              />
+        </ViroNode>
+
           <ViroNode
             scale={[0, 0, 0]}
             transformBehaviors={["billboardY"]}
@@ -189,7 +205,13 @@ var ARCarDemo = createReactClass({
       playAnim: true
     });
   },
+  _pervCar() {    
+    console.log('prev car navigation')
 
+  },
+  _nextCar() {
+    console.log('next car navigation')
+  },
   _selectWhite() {
     this.setState({
       texture: "white",
@@ -267,6 +289,10 @@ ViroMaterials.createMaterials({
     diffuseColor: "rgb(231,231,231)"
   },
   blue_sphere: {
+    lightingModel: "PBR",
+    diffuseColor: "rgb(19,42,143)"
+  },
+  blue_plane: {
     lightingModel: "PBR",
     diffuseColor: "rgb(19,42,143)"
   },
