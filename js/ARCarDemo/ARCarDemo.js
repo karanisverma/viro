@@ -147,9 +147,11 @@ var ARCarDemo = createReactClass({
               shadowCastingBitMask={0}
             />
           </ViroNode>
-          <ViroNode rotation={this.state.rotation} ref={this._setARNodeRef}>
+          <ViroNode 
+            rotation={this.state.rotation} 
+            ref={this._setARNodeRef}
+            animation={{ name: this.state.carAnimName, run: this.state.carPlayAnim, onFinish: this._onCarAnimationFinish }}>
           <Viro3DObject
-            position = {this.state.position}
             scale={[0.09, 0.09, 0.09]}
             source={require("./res/tesla/object_car.obj")}
             resources={[require("./res/tesla/object_car.mtl")]}
@@ -157,7 +159,6 @@ var ARCarDemo = createReactClass({
             materials={this.state.texture}
             onClick={this._toggleButtons}
             onRotate={this._onRotate}
-            animation={{ name: this.state.carAnimName, run: this.state.carPlayAnim, onFinish: this._onCarAnimationFinish }}
           />
           </ViroNode>
           <ViroSpotLight
@@ -185,8 +186,8 @@ var ARCarDemo = createReactClass({
     );
   },
   _onAnchorFound(anchor) {
-    console.log('This is from onAnchorFound function -->', JSON.stringify(anchor))
-    this._setCarPosition(anchor.center)
+    // console.log('This is from onAnchorFound function -->', JSON.stringify(anchor))
+    // this._setCarPosition(anchor.center)
     this.setState({
       animateCar: true
     });
@@ -255,11 +256,11 @@ var ARCarDemo = createReactClass({
       tapRed: true
     });
   },
-  _setCarPosition(position) {
-    this.setState({
-      position: position
-    })
-  },
+  // _setCarPosition(position) {
+  //   this.setState({
+  //     position: position
+  //   })
+  // },
   _selectYellow() {
     this.setState({
       texture: "yellow",
@@ -344,12 +345,12 @@ ViroARTrackingTargets.createTargets({
 
 ViroAnimations.registerAnimations({
   moveOutCar: {
-    properties: {positionX: -4, scaleX: 0, scaleY: 0, scaleZ: 0 },
+    properties: {positionX: "-=4", scaleX: 0, scaleY: 0, scaleZ: 0 },
     duration: 500,
     easing: "easeineaseout"
   },
   moveInCar: {
-    properties: {positionX: 0, scaleX: 0.9, scaleY: 0.9, scaleZ: 0.9 },
+    properties: {positionX: "+=4", scaleX: 1, scaleY: 1, scaleZ: 1 },
     duration: 500,
     easing: "easeineaseout"
   },
