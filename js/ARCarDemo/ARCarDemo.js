@@ -36,8 +36,8 @@ var ARCarDemo = createReactClass({
       tapYellow: false,
       rotation : [0, 0, 0],
       position: [0, 0, 0],
-      carAnimName:'',
-      carPlayAnim: false
+      carAnimName:['moveOutCar', 'moveInCar'],
+      carPlayAnim: [false,true]
     };
   },
 
@@ -150,17 +150,35 @@ var ARCarDemo = createReactClass({
           <ViroNode 
             rotation={this.state.rotation} 
             ref={this._setARNodeRef}
-            animation={{ name: this.state.carAnimName, run: this.state.carPlayAnim, onFinish: this._onCarAnimationFinish }}>
-          <Viro3DObject
-            scale={[0.09, 0.09, 0.09]}
-            source={require("./res/tesla/object_car.obj")}
-            resources={[require("./res/tesla/object_car.mtl")]}
-            type="OBJ"
-            materials={this.state.texture}
-            onClick={this._toggleButtons}
-            onRotate={this._onRotate}
-          />
+            scale={[1, 1, 1]}
+            animation={{ name: this.state.carAnimName[0], run: this.state.carPlayAnim[0], onFinish: () => this._onCarAnimationFinish(0) }}>
+            <Viro3DObject
+              scale={[0.09, 0.09, 0.09]}
+              source={require("./res/tesla/object_car.obj")}
+              resources={[require("./res/tesla/object_car.mtl")]}
+              type="OBJ"
+              materials={this.state.texture}
+              onClick={this._toggleButtons}
+              onRotate={this._onRotate}
+            />
           </ViroNode>
+          <ViroNode 
+            position={[0,0, 0]}
+            rotation={this.state.rotation} 
+            ref={this._setARNodeRef}
+            scale={[1, 1, 1]}
+            animation={{ name: this.state.carAnimName[1], run: this.state.carPlayAnim[1], onFinish: () => this._onCarAnimationFinish(1) }}>
+            <Viro3DObject
+              scale={[0.09, 0.09, 0.09]}
+              source={require("./res/tesla/object_car.obj")}
+              resources={[require("./res/tesla/object_car.mtl")]}
+              type="OBJ"
+              materials={this.state.texture}
+              onClick={this._toggleButtons}
+              onRotate={this._onRotate}
+            />
+          </ViroNode>
+
           <ViroSpotLight
             innerAngle={5}
             outerAngle={25}
@@ -213,24 +231,33 @@ var ARCarDemo = createReactClass({
       playAnim: true
     });
   },
-  _onCarAnimationFinish() {
+  _onCarAnimationFinish(n) {
+    console.log('`_onCarAnimationFinish` called')
+    console.log('before state change state->', this.state)
     this.setState({
-      carPlayAnim: false
-    })
+      carPlayAnim: [...this.state.carPlayAnim.slice(0,n), false, ...this.state.carPlayAnim.slice(n+1)]
+    }, () => console.log('after state change state->', this.state))
+    
   },
-  _moveOutCar() {
-    this.setState({
-      carAnimName: this.state.carAnimName == "moveOutCar" ? "moveInCar" : "moveOutCar",
-      carPlayAnim: true
-    });
+  _moveOutCar(direction) {
+    console.log('`_moveOutCar` called')
+    console.log('before state change state->', this.state)
+      this.setState({
+        carAnimName: this.state.carAnimName.map(() => direction),
+        // carAnimName: [...this.state.carAnimName.slice(0,n), this.state.carAnimName[n] == "moveOutCar" ? "moveInCar" : "moveOutCar", ...this.state.carAnimName.slice(n+1)],
+        carPlayAnim: this.state.carPlayAnim.map(()=> true)
+        // carPlayAnim: [...this.state.carPlayAnim.slice(0,n), true, ...this.state.carPlayAnim.slice(n+1)]
+      }, () => console.log('after state change state->', this.state));
+    
+    
   },
   _pervCar() {    
     console.log('prev car navigation')
-    this._moveOutCar()
+    this._moveOutCar('moveOutCar')
   },
   _nextCar() {
     console.log('next car navigation')
-    this._moveOutCar()
+    this._moveOutCar('moveInCar')
   },
   _selectWhite() {
     this.setState({
@@ -256,11 +283,6 @@ var ARCarDemo = createReactClass({
       tapRed: true
     });
   },
-  // _setCarPosition(position) {
-  //   this.setState({
-  //     position: position
-  //   })
-  // },
   _selectYellow() {
     this.setState({
       texture: "yellow",
@@ -345,12 +367,14 @@ ViroARTrackingTargets.createTargets({
 
 ViroAnimations.registerAnimations({
   moveOutCar: {
-    properties: {positionX: "-=4", scaleX: 0, scaleY: 0, scaleZ: 0 },
+    properties: {positionX: "-=0.5" },
+    // properties: {positionX: "-=4", scaleX: 0, scaleY: 0, scaleZ: 0 },
     duration: 500,
     easing: "easeineaseout"
   },
   moveInCar: {
-    properties: {positionX: "+=4", scaleX: 1, scaleY: 1, scaleZ: 1 },
+    properties: {positionX: "+=0.5" },
+    // properties: {positionX: "+=4", scaleX: 1, scaleY: 1, scaleZ: 1 },
     duration: 500,
     easing: "easeineaseout"
   },
