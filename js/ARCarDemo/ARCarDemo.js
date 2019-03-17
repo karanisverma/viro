@@ -43,6 +43,8 @@ var ARCarDemo = createReactClass({
       carPlayAnim: [false,true],
       isPrevNavigationEnabled: true,
       isNextNavigationEnabled: false,
+      nextTapAnim: false,
+      prevTapAnim: false,
     };
   },
 
@@ -63,12 +65,16 @@ var ARCarDemo = createReactClass({
               vertices={[[-0.08,0], [0,0.08], [0,-0.08]]}
               materials={this.state.isNextNavigationEnabled ? "blue_plane" : "gray_plane"}
               onClick={this._nextCar}
+              opacity={0.9}
+              animation={{ name:"tapNavigation", run: this.state.nextTapAnim, onFinish: () => this._handleTapFinish('next') }}
               />
           <ViroPolygon
               position={[0.25, 0.1, 0]}
               vertices={[[0.08,0], [0,0.08], [0,-0.08]]}
               materials={this.state.isPrevNavigationEnabled ? "blue_plane" : "gray_plane"}
               onClick={this._pervCar}
+              opacity={0.9}
+              animation={{ name:"tapNavigation", run: this.state.prevTapAnim, onFinish: () => this._handleTapFinish('prev') }}
               />
         </ViroNode>
 
@@ -209,8 +215,6 @@ var ARCarDemo = createReactClass({
     );
   },
   _onAnchorFound(anchor) {
-    // console.log('This is from onAnchorFound function -->', JSON.stringify(anchor))
-    // this._setCarPosition(anchor.center)
     this.setState({
       animateCar: true
     });
@@ -228,7 +232,18 @@ var ARCarDemo = createReactClass({
 
     this.arNodeRef[index].setNativeProps({rotation:[this.state.rotation[index][0], this.state.rotation[index][1] + rotationFactor, this.state.rotation[index][2]]});
   },
-
+  _handleTapFinish(type) {
+    console.log('Handle tap finish called!')
+    if (type === 'next') {
+      this.setState({
+        nextTapAnim: false,
+      })
+    } else {
+      this.setState({
+        prevTapAnim: false,
+      })
+    }
+  },
   _toggleButtons() {
     this.setState({
       animName: this.state.animName == "scaleUp" ? "scaleDown" : "scaleUp",
@@ -288,16 +303,24 @@ var ARCarDemo = createReactClass({
   },
   _pervCar() {    
     console.log('prev car navigation')
-    if(this.state.selectedCarIndex < this.state.totalCars - 1) {
-      this._moveCar('rightToLeft');
-    }
-
+    this.setState({
+      prevTapAnim: true
+    }, () =>{
+      if(this.state.selectedCarIndex < this.state.totalCars - 1) {
+        this._moveCar('rightToLeft');
+      }
+    })
   },
   _nextCar() {
     console.log('next car navigation')
-    if(this.state.selectedCarIndex >0) {
-      this._moveCar('leftToRight')
-    }
+    this.setState({
+      nextTapAnim: true
+    }, () =>{
+      if(this.state.selectedCarIndex >0) {
+        this._moveCar('leftToRight')
+      }
+    })
+
 
   },
   _selectWhite() {
@@ -414,29 +437,29 @@ ViroAnimations.registerAnimations({
   rightToLeft: {
     properties: {positionX: "-=0.5" },
     // properties: {positionX: "-=4", scaleX: 0, scaleY: 0, scaleZ: 0 },
-    duration: 500,
+    duration: 300,
     easing: "easeineaseout"
   },
   leftToRightAndScaleDown: {
     properties: {positionX: "+=0.5", scaleX: 0, scaleY: 0, scaleZ: 0},
-    duration: 500
+    duration: 300
   },
   leftToRightAndScaleUp: {
     properties: {positionX: "+=0.5", scaleX:1, scaleY: 1, scaleZ: 1},
-    duration: 500
+    duration: 300
   },
   rightToLeftAndScaleDown: {
     properties: {positionX: "-=0.5", scaleX: 0, scaleY: 0, scaleZ: 0},
-    duration: 500
+    duration: 300
   },
   rightToLeftAndScaleUp: {
     properties: {positionX: "-=0.5", scaleX:1, scaleY: 1, scaleZ: 1 },
-    duration: 500
+    duration: 300
   },
   leftToRight: {
     properties: {positionX: "+=0.5" },
     // properties: {positionX: "+=4", scaleX: 1, scaleY: 1, scaleZ: 1 },
-    duration: 500,
+    duration: 300,
     easing: "easeineaseout"
   },
   scaleUp: {
@@ -460,6 +483,17 @@ ViroAnimations.registerAnimations({
     duration: 50,
     easing: "easeineaseout"
   },
+  back: {
+    properties: { positionZ: "-=0.025"},
+    duration: 50,
+    easing: "bounce"
+  },
+  front: {
+    properties: { positionZ: "+=0.025"},
+    duration: 50,
+    easing: "bounce"
+  },
+  tapNavigation: [["back","front"]],
   tapAnimation: [["scaleSphereUp", "scaleSphereDown"]],
   rotate: {
     properties: { rotateY: "+=90" },
