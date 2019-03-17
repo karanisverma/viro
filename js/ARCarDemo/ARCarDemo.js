@@ -24,6 +24,7 @@ import {
 var createReactClass = require("create-react-class");
 
 var ARCarDemo = createReactClass({
+  arNodeRef:[],
   getInitialState() {
     return {
       texture: "white",
@@ -36,7 +37,7 @@ var ARCarDemo = createReactClass({
       tapYellow: false,
       selectedCarIndex: 0,
       totalCars: 2,
-      rotation : [0, 0, 0],
+      rotation : [[0, 0, 0],[0, 0, 0]],
       position: [0, 0, 0],
       carAnimName:['rightToLeft', 'leftToRight'],
       carPlayAnim: [false,true],
@@ -152,8 +153,8 @@ var ARCarDemo = createReactClass({
             />
           </ViroNode>
           <ViroNode 
-            rotation={this.state.rotation} 
-            ref={this._setARNodeRef}
+            rotation={this.state.rotation[0]} 
+            ref={(component) =>this.arNodeRef.push(component)}
             scale={[1, 1, 1]}
             animation={{ name: this.state.carAnimName[0], run: this.state.carPlayAnim[0], onFinish: () => this._onCarAnimationFinish(0) }}>
             <Viro3DObject
@@ -163,13 +164,13 @@ var ARCarDemo = createReactClass({
               type="OBJ"
               materials={this.state.texture}
               onClick={this._toggleButtons}
-              onRotate={this._onRotate}
+              onRotate={(rotateState, rotationFactor, source) => this._onRotate(0,rotateState, rotationFactor, source)}
             />
           </ViroNode>
           <ViroNode 
             position={[0,0, 0]}
-            rotation={this.state.rotation} 
-            ref={this._setARNodeRef}
+            rotation={this.state.rotation[1]} 
+            ref={(component) =>this.arNodeRef.push(component)}
             scale={[0, 0, 0]}
             animation={{ name: this.state.carAnimName[1], run: this.state.carPlayAnim[1], onFinish: () => this._onCarAnimationFinish(1) }}>
             <Viro3DObject
@@ -179,7 +180,7 @@ var ARCarDemo = createReactClass({
               type="OBJ"
               materials={this.state.texture}
               onClick={this._toggleButtons}
-              onRotate={this._onRotate}
+              onRotate={(rotateState, rotationFactor, source) => this._onRotate(1,rotateState, rotationFactor, source)}
             />
           </ViroNode>
 
@@ -214,19 +215,18 @@ var ARCarDemo = createReactClass({
       animateCar: true
     });
   },
-  _setARNodeRef(component) {
-    this.arNodeRef = component;
-  },
-  _onRotate(rotateState, rotationFactor, source) {
+  _onRotate(index, rotateState, rotationFactor, source) {
      const [a , b ,c] = this.state.rotation
      if (rotateState == 3) {
       this.setState({
-        rotation : [a, b + rotationFactor, c]
+        rotation : this.state.rotation.map((r,i) =>{
+           return i===index ? [r[0], r[1]+rotationFactor, r[2]]: r
+        })
       });
       return;
     }
 
-    this.arNodeRef.setNativeProps({rotation:[this.state.rotation[0], this.state.rotation[1] + rotationFactor, this.state.rotation[2]]});
+    this.arNodeRef[index].setNativeProps({rotation:[this.state.rotation[index][0], this.state.rotation[index][1] + rotationFactor, this.state.rotation[index][2]]});
   },
 
   _toggleButtons() {
