@@ -39,7 +39,9 @@ var ARCarDemo = createReactClass({
       rotation : [0, 0, 0],
       position: [0, 0, 0],
       carAnimName:['rightToLeft', 'leftToRight'],
-      carPlayAnim: [false,true]
+      carPlayAnim: [false,true],
+      isPrevNavigationEnabled: true,
+      isNextNavigationEnabled: false,
     };
   },
 
@@ -58,13 +60,13 @@ var ARCarDemo = createReactClass({
           <ViroPolygon
               position={[-0.25, 0.1, 0]}
               vertices={[[-0.08,0], [0,0.08], [0,-0.08]]}
-              materials={"blue_plane"}
+              materials={this.state.isPrevNavigationEnabled ? "blue_plane" : "gray_plane"}
               onClick={this._pervCar}
               />
           <ViroPolygon
               position={[0.25, 0.1, 0]}
               vertices={[[0.08,0], [0,0.08], [0,-0.08]]}
-              materials={"blue_plane"}
+              materials={this.state.isNextNavigationEnabled ? "blue_plane" : "gray_plane"}
               onClick={this._nextCar}
               />
         </ViroNode>
@@ -259,20 +261,44 @@ var ARCarDemo = createReactClass({
           }
         }),
         selectedCarIndex: selectedCarIndex,
-        // carAnimName: [...this.state.carAnimName.slice(0,n), this.state.carAnimName[n] == "rightToLeft" ? "rightToLeftToRight" : "rightToLeft", ...this.state.carAnimName.slice(n+1)],
         carPlayAnim: this.state.carPlayAnim.map(()=> true)
-        // carPlayAnim: [...this.state.carPlayAnim.slice(0,n), true, ...this.state.carPlayAnim.slice(n+1)]
-      }, () => console.log('after state change state->', this.state));
+      }, () => {console.log('after state change state->', this.state)
+      this._handleNavigationState();
+    });
     
     
+  },
+  _handleNavigationState() {
+    if(this.state.selectedCarIndex < this.state.totalCars - 1) {
+      this.setState({
+        isPrevNavigationEnabled: true,
+        isNextNavigationEnabled: false
+      })
+    } else if(this.state.selectedCarIndex === 0) {
+      this.setState({
+        isPrevNavigationEnabled: false,
+        isNextNavigationEnabled: true
+      })
+    } else {
+      this.setState({
+        isPrevNavigationEnabled: false,
+        isNextNavigationEnabled: true
+      })
+      }
   },
   _pervCar() {    
     console.log('prev car navigation')
-    this._moveCar('rightToLeft')
+    if(this.state.selectedCarIndex < this.state.totalCars - 1) {
+      this._moveCar('rightToLeft');
+    }
+
   },
   _nextCar() {
     console.log('next car navigation')
-    this._moveCar('leftToRight')
+    if(this.state.selectedCarIndex >0) {
+      this._moveCar('leftToRight')
+    }
+
   },
   _selectWhite() {
     this.setState({
@@ -357,6 +383,10 @@ ViroMaterials.createMaterials({
   blue_plane: {
     lightingModel: "PBR",
     diffuseColor: "rgb(19,42,143)"
+  },
+  gray_plane: {
+    lightingModel: "PBR",
+    diffuseColor: "rgb(75,76,79)"
   },
   grey_sphere: {
     lightingModel: "PBR",
