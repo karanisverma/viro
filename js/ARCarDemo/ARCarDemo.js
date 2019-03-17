@@ -34,9 +34,11 @@ var ARCarDemo = createReactClass({
       tapGrey: false,
       tapRed: false,
       tapYellow: false,
+      selectedCarIndex: 0,
+      totalCars: 2,
       rotation : [0, 0, 0],
       position: [0, 0, 0],
-      carAnimName:['moveOutCar', 'moveInCar'],
+      carAnimName:['rightToLeft', 'leftToRight'],
       carPlayAnim: [false,true]
     };
   },
@@ -153,7 +155,7 @@ var ARCarDemo = createReactClass({
             scale={[1, 1, 1]}
             animation={{ name: this.state.carAnimName[0], run: this.state.carPlayAnim[0], onFinish: () => this._onCarAnimationFinish(0) }}>
             <Viro3DObject
-              scale={[0.09, 0.09, 0.09]}
+              scale={[0.05, 0.05, 0.05]}
               source={require("./res/tesla/object_car.obj")}
               resources={[require("./res/tesla/object_car.mtl")]}
               type="OBJ"
@@ -169,7 +171,7 @@ var ARCarDemo = createReactClass({
             scale={[1, 1, 1]}
             animation={{ name: this.state.carAnimName[1], run: this.state.carPlayAnim[1], onFinish: () => this._onCarAnimationFinish(1) }}>
             <Viro3DObject
-              scale={[0.09, 0.09, 0.09]}
+              scale={[0.05, 0.05, 0.05]}
               source={require("./res/tesla/object_car.obj")}
               resources={[require("./res/tesla/object_car.mtl")]}
               type="OBJ"
@@ -214,10 +216,10 @@ var ARCarDemo = createReactClass({
     this.arNodeRef = component;
   },
   _onRotate(rotateState, rotationFactor, source) {
-
-    if (rotateState == 3) {
+     const [a , b ,c] = this.state.rotation
+     if (rotateState == 3) {
       this.setState({
-        rotation : [this.state.rotation[0], this.state.rotation[1] + rotationFactor, this.state.rotation[2]]
+        rotation : [a, b + rotationFactor, c]
       });
       return;
     }
@@ -236,15 +238,28 @@ var ARCarDemo = createReactClass({
     console.log('before state change state->', this.state)
     this.setState({
       carPlayAnim: [...this.state.carPlayAnim.slice(0,n), false, ...this.state.carPlayAnim.slice(n+1)]
-    }, () => console.log('after state change state->', this.state))
-    
+    }, () => console.log('after state change state->', this.state)) 
   },
-  _moveOutCar(direction) {
-    console.log('`_moveOutCar` called')
+  _moveCar(direction) {
+    let selectedCarIndex = this.state.selectedCarIndex
+    let prevCarIndex = selectedCarIndex
+    if ( direction === 'rightToLeft' && selectedCarIndex<this.state.totalCars) {
+      selectedCarIndex += 1;
+    } else if (selectedCarIndex > 0) {
+      selectedCarIndex -= 1;
+    }
+    console.log('`_moveCar` called ->', selectedCarIndex)
     console.log('before state change state->', this.state)
       this.setState({
-        carAnimName: this.state.carAnimName.map(() => direction),
-        // carAnimName: [...this.state.carAnimName.slice(0,n), this.state.carAnimName[n] == "moveOutCar" ? "moveInCar" : "moveOutCar", ...this.state.carAnimName.slice(n+1)],
+        carAnimName: this.state.carAnimName.map((v,i) => {
+          if (i===selectedCarIndex) {
+            return `${direction}AndScaleUp`
+          } else {
+            return `${direction}AndScaleDown`
+          }
+        }),
+        selectedCarIndex: selectedCarIndex,
+        // carAnimName: [...this.state.carAnimName.slice(0,n), this.state.carAnimName[n] == "rightToLeft" ? "rightToLeftToRight" : "rightToLeft", ...this.state.carAnimName.slice(n+1)],
         carPlayAnim: this.state.carPlayAnim.map(()=> true)
         // carPlayAnim: [...this.state.carPlayAnim.slice(0,n), true, ...this.state.carPlayAnim.slice(n+1)]
       }, () => console.log('after state change state->', this.state));
@@ -253,11 +268,11 @@ var ARCarDemo = createReactClass({
   },
   _pervCar() {    
     console.log('prev car navigation')
-    this._moveOutCar('moveOutCar')
+    this._moveCar('rightToLeft')
   },
   _nextCar() {
     console.log('next car navigation')
-    this._moveOutCar('moveInCar')
+    this._moveCar('leftToRight')
   },
   _selectWhite() {
     this.setState({
@@ -366,13 +381,29 @@ ViroARTrackingTargets.createTargets({
 });
 
 ViroAnimations.registerAnimations({
-  moveOutCar: {
+  rightToLeft: {
     properties: {positionX: "-=0.5" },
     // properties: {positionX: "-=4", scaleX: 0, scaleY: 0, scaleZ: 0 },
     duration: 500,
     easing: "easeineaseout"
   },
-  moveInCar: {
+  leftToRightAndScaleDown: {
+    properties: {positionX: "+=0.5", scaleX: 0, scaleY: 0, scaleZ: 0},
+    duration: 500
+  },
+  leftToRightAndScaleUp: {
+    properties: {positionX: "+=0.5", scaleX:1, scaleY: 1, scaleZ: 1},
+    duration: 500
+  },
+  rightToLeftAndScaleDown: {
+    properties: {positionX: "-=0.5", scaleX: 0, scaleY: 0, scaleZ: 0},
+    duration: 500
+  },
+  rightToLeftAndScaleUp: {
+    properties: {positionX: "-=0.5", scaleX:1, scaleY: 1, scaleZ: 1 },
+    duration: 500
+  },
+  leftToRight: {
     properties: {positionX: "+=0.5" },
     // properties: {positionX: "+=4", scaleX: 1, scaleY: 1, scaleZ: 1 },
     duration: 500,
@@ -385,7 +416,7 @@ ViroAnimations.registerAnimations({
   },
   scaleDown: { properties: { scaleX: 0, scaleY: 0, scaleZ: 0 }, duration: 200 },
   scaleCar: {
-    properties: { scaleX: 0.09, scaleY: 0.09, scaleZ: 0.09 },
+    properties: { scaleX: 0.05, scaleY: 0.05, scaleZ: 0.05 },
     duration: 500,
     easing: "bounce"
   },
