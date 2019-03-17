@@ -60,14 +60,14 @@ var ARCarDemo = createReactClass({
           <ViroPolygon
               position={[-0.25, 0.1, 0]}
               vertices={[[-0.08,0], [0,0.08], [0,-0.08]]}
-              materials={this.state.isPrevNavigationEnabled ? "blue_plane" : "gray_plane"}
-              onClick={this._pervCar}
+              materials={this.state.isNextNavigationEnabled ? "blue_plane" : "gray_plane"}
+              onClick={this._nextCar}
               />
           <ViroPolygon
               position={[0.25, 0.1, 0]}
               vertices={[[0.08,0], [0,0.08], [0,-0.08]]}
-              materials={this.state.isNextNavigationEnabled ? "blue_plane" : "gray_plane"}
-              onClick={this._nextCar}
+              materials={this.state.isPrevNavigationEnabled ? "blue_plane" : "gray_plane"}
+              onClick={this._pervCar}
               />
         </ViroNode>
 
@@ -170,7 +170,7 @@ var ARCarDemo = createReactClass({
             position={[0,0, 0]}
             rotation={this.state.rotation} 
             ref={this._setARNodeRef}
-            scale={[1, 1, 1]}
+            scale={[0, 0, 0]}
             animation={{ name: this.state.carAnimName[1], run: this.state.carPlayAnim[1], onFinish: () => this._onCarAnimationFinish(1) }}>
             <Viro3DObject
               scale={[0.05, 0.05, 0.05]}
